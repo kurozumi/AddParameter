@@ -1,4 +1,5 @@
 <?php
+
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -12,11 +13,12 @@
  */
 class AddParameter extends SC_Plugin_Base
 {
-	public function __construct(array $arrSelfInfo)
-	{
-		parent::__construct($arrSelfInfo);
-	}
-	
+
+    public function __construct(array $arrSelfInfo)
+    {
+        parent::__construct($arrSelfInfo);
+    }
+
     /**
      * インストール
      * installはプラグインのインストール時に実行されます.
@@ -27,6 +29,7 @@ class AddParameter extends SC_Plugin_Base
      */
     public function install($arrPlugin, $objPluginInstaller = null)
     {
+        
     }
 
     /**
@@ -39,6 +42,7 @@ class AddParameter extends SC_Plugin_Base
      */
     public function uninstall($arrPlugin, $objPluginInstaller = null)
     {
+        
     }
 
     /**
@@ -51,6 +55,7 @@ class AddParameter extends SC_Plugin_Base
      */
     public function enable($arrPlugin, $objPluginInstaller = null)
     {
+        
     }
 
     /**
@@ -63,5 +68,7 @@ class AddParameter extends SC_Plugin_Base
      */
     public function disable($arrPlugin, $objPluginInstaller = null)
     {
+        
     }
+
 }
