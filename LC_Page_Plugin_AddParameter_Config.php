@@ -41,10 +41,18 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     function init()
     {
         parent::init();
+		
         $this->tpl_mainpage = PLUGIN_UPLOAD_REALDIR . "AddParameter/templates/config.tpl";
-        $this->tpl_subtitle = "パラメータ追加 設定画面";
+        $this->tpl_subtitle = "パラメータ追加";
 
         $this->masterData = new SC_DB_MasterData_Ex();
+		
+		$plugin = SC_Plugin_Util_Ex::getPluginByPluginCode("AddParameter");
+		
+		if($plugin["enable"]==2) {
+			$this->tpl_onload = "alert('プラグインを有効にして下さい。');";
+			$this->tpl_onload .= 'window.close();';
+		}
     }
 
     /**
