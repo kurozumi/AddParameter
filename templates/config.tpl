@@ -80,7 +80,7 @@
     <tr >
         <td bgcolor="#f3f3f3" width="20%"><!--{$arrKeys[cnt]|h}--></td>
         <td>
-			 <a href="?" onclick="eccube.setModeAndSubmit('delete', 'id', '<!--{$arrKeys[cnt]|h}-->'); return false;">削除</a>
+			 <a href="?" onclick="fnModeSubmit('delete', 'id', '<!--{$arrKeys[cnt]|h}-->'); return false;">削除</a>
         </td>
     </tr>
 <!--{/section}-->
