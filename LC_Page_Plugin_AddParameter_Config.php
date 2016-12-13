@@ -171,7 +171,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     public function insert(&$arrForm)
     {
         // DBのデータを更新
-        $this->masterData->insertMasterData('mtb_constants', $arrForm["id"], $arrForm["name"], $arrForm["remarks"]);
+        $this->masterData->insertMasterData('mtb_constants', $arrForm["id"], '""', $arrForm["remarks"]);
 
         // キャッシュを生成
         $this->masterData->createCache('mtb_constants', array(), true, array('id', 'remarks'));
