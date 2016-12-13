@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of EC-CUBE
  *
@@ -26,6 +27,8 @@ require_once CLASS_EX_REALDIR . 'page_extends/admin/LC_Page_Admin_Ex.php';
 
 class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
 {
+    const PREFIX = "PLG_";
+
     /** 定数キーとなる配列 */
     public $arrKeys;
     public $arrForm = array();
@@ -52,6 +55,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         }
 
     }
+
     /**
      * プロセス.
      *
@@ -63,6 +67,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         $this->sendResponse();
 
     }
+
     /**
      * Page のアクション.
      *
@@ -70,9 +75,12 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
      */
     function action()
     {
-        // キーの配列を生成
-        $this->arrKeys = $this->getParamKeys();
-
+        // 登録したパラメータのキーの配列を生成
+        $arrKeys = array_filter($this->getParamKeys(), function($value) {
+            return (preg_match("/^".self::PREFIX."/", $value));
+        });
+        $this->arrKeys = array_values($arrKeys);
+        
         $objFormParam = new SC_FormParam_Ex();
         $this->lfInitParam($objFormParam);
         $objFormParam->setParam($_POST);
@@ -94,6 +102,13 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
                     $this->tpl_onload .= 'window.close();';
                 }
                 break;
+            case 'delete':
+                $arrForm = $objFormParam->getHashArray();
+                $this->delete($arrForm);
+
+                $this->tpl_onload = "alert('削除しました。');";
+                $this->tpl_onload .= 'window.close();';
+                break;
             default:
                 break;
         }
@@ -102,6 +117,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         $this->setTemplate($this->tpl_mainpage);
 
     }
+
     /**
      * デストラクタ.
      *
@@ -112,6 +128,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         parent::destroy();
 
     }
+
     /**
      * パラメーター情報の初期化
      *
@@ -125,13 +142,11 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         $objFormParam->addParam('コメント', 'remarks', STEXT_LEN, 'KVa', array('NO_SPTAB', 'MAX_LENGTH_CHECK'));
 
     }
+
     /**
-     * パラメーター情報を更新する.
-     *
-     * 画面の設定値で mtb_constants テーブルの値とキャッシュを更新する.
-     *
-     * @access private
-     * @return void
+     * パラメーターを追加する.
+     * 
+     * @param type $arrForm
      */
     public function insert(&$arrForm)
     {
@@ -145,6 +160,26 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         $this->masterData->createCache('mtb_constants', array(), true, array('id', 'remarks'));
 
     }
+
+    /**
+     * パラメータを削除する
+     * 
+     * @param type $arrForm
+     */
+    public function delete(&$arrForm)
+    {
+        // DBのデータを更新
+        $objQuery = & SC_Query_Ex::getSingletonInstance();
+        $objQuery->delete("mtb_constants", "id=?", array($arrForm["id"]));
+
+        // キャッシュの削除
+        $this->masterData->clearCache("mtb_constants");
+
+        // キャッシュを生成
+        $this->masterData->createCache('mtb_constants', array(), true, array('id', 'remarks'));
+
+    }
+
     /**
      * パラメーターのキーを配列で返す.
      *
@@ -162,6 +197,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         return $keys;
 
     }
+
     /**
      * エラーチェック
      * 
@@ -172,8 +208,8 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     {
         $arrErr = array();
 
-        if (!preg_match("/^PLG_/", $objFormParam->getValue('id'))) {
-            $arrErr["id"] = sprintf("※ 定数名の先頭には「PLG_」を付けて下さい。");
+        if (!preg_match("/^" . self::PREFIX . "/", $objFormParam->getValue('id'))) {
+            $arrErr["id"] = sprintf("※ 定数名の先頭には「%s」を付けて下さい。", self::PREFIX);
         }
 
         foreach (explode("_", $objFormParam->getValue('id')) as $str) {
@@ -192,6 +228,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         return $arrErr;
 
     }
+
 }
 
 ?>

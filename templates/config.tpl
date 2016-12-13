@@ -60,8 +60,7 @@
     <tr >
     </tr>
 </table>
-
-
+		
 <div class="btn-area">
     <ul>
         <li>
@@ -70,5 +69,23 @@
     </ul>
 </div>
 
+		
+<h2>追加されたパラメータ</h2>
+<table border="0" cellspacing="1" cellpadding="8" summary=" ">
+    <tr >
+        <th bgcolor="#f3f3f3">定数名</th>
+        <th>削除</th>
+    </tr>
+<!--{section name=cnt loop=$arrKeys}-->
+    <tr >
+        <td bgcolor="#f3f3f3" width="20%"><!--{$arrKeys[cnt]|h}--></td>
+        <td>
+			 <a href="?" onclick="eccube.setModeAndSubmit('delete', 'id', '<!--{$arrKeys[cnt]|h}-->'); return false;">削除</a>
+        </td>
+    </tr>
+<!--{/section}-->
+</table>
+
 </form>
+
 <!--{include file="`$smarty.const.TEMPLATE_ADMIN_REALDIR`admin_popup_footer.tpl"}-->
