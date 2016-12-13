@@ -75,45 +75,65 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
      */
     function action()
     {
-        // 登録したパラメータのキーの配列を生成
-        $arrKeys = array_filter($this->getParamKeys(), function($value) {
-            return (preg_match("/^".self::PREFIX."/", $value));
-        });
-        $this->arrKeys = array_values($arrKeys);
-        
         $objFormParam = new SC_FormParam_Ex();
         $this->lfInitParam($objFormParam);
         $objFormParam->setParam($_POST);
         $objFormParam->convParam();
 
+        // 定数名
+        $id = $objFormParam->getValue('id');
+
         $arrForm = array();
-        switch ($this->getMode()) {
-            case 'regist':
-                $arrForm = $objFormParam->getHashArray();
-
-                $this->arrErr = $this->checkError($objFormParam);
-
-                // エラーなしの場合にはデータを更新
-                if (count($this->arrErr) == 0) {
-                    // データ挿入
-                    $this->insert($arrForm);
-
-                    $this->tpl_onload = "alert('登録が完了しました。');";
-                    $this->tpl_onload .= 'window.close();';
-                }
+        $mode = $this->getMode();
+        switch ($mode) {
+            //　編集前
+            case 'pre_edit':
+                $arrForm = $this->getParam($id);
+                // 定数名は編集させない
+                $arrForm["pre_edit"] = true;
+                $this->tpl_onload = 'document.form1.mode.value = "edit";';
                 break;
+            // 削除
             case 'delete':
-                $arrForm = $objFormParam->getHashArray();
-                $this->delete($arrForm);
+                $this->delete($id);
 
                 $this->tpl_onload = "alert('削除しました。');";
                 $this->tpl_onload .= 'window.close();';
+                break;
+            // 登録・編集
+            case 'regist':
+            case 'edit':
+                $arrForm = $objFormParam->getHashArray();
+
+                $this->arrErr = $objFormParam->checkError();
+                // エラーなしの場合にはデータを更新
+                if (count($this->arrErr) == 0) {
+                    switch ($mode) {
+                        case 'regist':// データ挿入
+                            $this->arrErr = $this->checkId($id);
+                            
+                            // 定数名にエラーがない場合データを挿入
+                            if (count($this->arrErr) == 0) {
+                                $this->insert($arrForm);
+                                $this->tpl_onload = "alert('登録が完了しました。');";
+                                $this->tpl_onload .= 'window.close();';
+                            }
+                            break;
+                        case 'edit': // データ編集
+                            $this->update($arrForm);
+                            $this->tpl_onload = "alert('更新が完了しました。');";
+                            $this->tpl_onload .= 'window.close();';
+                            break;
+                    }
+                }
                 break;
             default:
                 break;
         }
 
+        $this->arrParams = $this->getParams();
         $this->arrForm = $arrForm;
+
         $this->setTemplate($this->tpl_mainpage);
 
     }
@@ -153,8 +173,21 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         // DBのデータを更新
         $this->masterData->insertMasterData('mtb_constants', $arrForm["id"], $arrForm["name"], $arrForm["remarks"]);
 
-        // キャッシュの削除
-        $this->masterData->clearCache("mtb_constants");
+        // キャッシュを生成
+        $this->masterData->createCache('mtb_constants', array(), true, array('id', 'remarks'));
+
+    }
+
+    /**
+     * パラメーターを更新する.
+     * 
+     * @param type $arrForm
+     */
+    public function update(&$arrForm)
+    {
+        // DBのデータを更新
+        $objQuery = & SC_Query_Ex::getSingletonInstance();
+        $objQuery->update("mtb_constants", $arrForm, "id=?", array($arrForm["id"]));
 
         // キャッシュを生成
         $this->masterData->createCache('mtb_constants', array(), true, array('id', 'remarks'));
@@ -166,17 +199,39 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
      * 
      * @param type $arrForm
      */
-    public function delete(&$arrForm)
+    public function delete($id)
     {
         // DBのデータを更新
         $objQuery = & SC_Query_Ex::getSingletonInstance();
-        $objQuery->delete("mtb_constants", "id=?", array($arrForm["id"]));
-
-        // キャッシュの削除
-        $this->masterData->clearCache("mtb_constants");
+        $objQuery->delete("mtb_constants", "id=?", array($id));
 
         // キャッシュを生成
         $this->masterData->createCache('mtb_constants', array(), true, array('id', 'remarks'));
+
+    }
+
+    /**
+     * 
+     * 
+     * @param text $id
+     * @return arry
+     */
+    public function getParam($id)
+    {
+        $objQuery = & SC_Query_Ex::getSingletonInstance();
+        return $objQuery->getRow('*', 'mtb_constants', 'id = ?', array($id));
+
+    }
+
+    /**
+     * 登録したパラメータのリストを返す
+     * 
+     * @return array
+     */
+    public function getParams()
+    {
+        $objQuery = & SC_Query_Ex::getSingletonInstance();
+        return $objQuery->select('*', 'mtb_constants', 'id LIKE ?', array("PLG_%"));
 
     }
 
@@ -186,7 +241,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
      * @access private
      * @return array パラメーターのキーの配列
      */
-    function getParamKeys()
+    public function getParamKeys()
     {
         $keys = array();
         $i = 0;
@@ -199,36 +254,32 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     }
 
     /**
-     * エラーチェック
+     * 定数名チェック
      * 
-     * @param type $objFormParam
-     * @return type
+     * @param type $id
+     * @return array
      */
-    public function checkError($objFormParam)
+    public function checkId($id)
     {
         $arrErr = array();
 
-        if (!preg_match("/^" . self::PREFIX . "/", $objFormParam->getValue('id'))) {
+        if (!preg_match("/^" . self::PREFIX . "/", $id)) {
             $arrErr["id"] = sprintf("※ 定数名の先頭には「%s」を付けて下さい。", self::PREFIX);
         }
 
-        foreach (explode("_", $objFormParam->getValue('id')) as $str) {
+        foreach (explode("_", $id) as $str) {
             if (!ctype_upper($str))
                 $arrErr["id"] = "※ 定数名は英数の大文字を使用して下さい。また区切り文字としてアンダースコア(_)を使用して下さい。";
         }
 
         $constants = $this->getParamKeys();
 
-        if (in_array($objFormParam->getValue('id'), $constants)) {
-            $arrErr["id"] = sprintf("※ 定数名「%s」は定義済みです。", $objFormParam->getValue('id'));
+        if (in_array($id, $constants)) {
+            $arrErr["id"] = sprintf("※ 定数名「%s」は定義済みです。", $id);
         }
-
-        $arrErr = array_merge($arrErr, $objFormParam->checkError());
 
         return $arrErr;
 
     }
 
 }
-
-?>

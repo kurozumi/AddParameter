@@ -41,9 +41,14 @@
 
 <table border="0" cellspacing="1" cellpadding="8" summary=" ">
     <tr >
-        <th bgcolor="#f3f3f3" style="width:20%;">定数名</th>
+        <th style="width:20%;">定数名</th>
         <td>
+			<!--{if $arrForm.pre_edit==1}-->
+			<!--{$arrForm.id|h}-->
+			<input type="hidden" name="id" value="<!--{$arrForm.id|h}-->" />
+			<!--{else}-->
 			<input type="text" name="id" value="<!--{$arrForm.id|h}-->" class="box50" />
+			<!--{/if}-->
 		</td>
 	</tr>
 	<tr>
@@ -56,8 +61,6 @@
         <td>
 			<input type="text" name="remarks" value="<!--{$arrForm.remarks|h}-->" class="box50" />
         </td>
-    </tr>
-    <tr >
     </tr>
 </table>
 		
@@ -73,17 +76,23 @@
 <h2>追加したパラメータ一覧</h2>
 <table border="0" cellspacing="1" cellpadding="8" summary=" ">
     <tr >
-        <th bgcolor="#f3f3f3">定数名</th>
-        <th>削除</th>
+        <th>定数名</th>
+		<th>コメント</th>
+        <th>編集</th>
+		<th>削除</th>
     </tr>
-<!--{section name=cnt loop=$arrKeys}-->
+<!--{foreach from=$arrParams item=arrParam name=arrParam}-->
     <tr >
-        <td bgcolor="#f3f3f3" width="20%"><!--{$arrKeys[cnt]|h}--></td>
+        <td bgcolor="#f3f3f3" width="20%"><!--{$arrParam.id|h}--></td>
+		<td><!--{$arrParam.remarks|h}--></td>
         <td>
-			 <a href="?" onclick="fnModeSubmit('delete', 'id', '<!--{$arrKeys[cnt]|h}-->'); return false;">削除</a>
+			 <a href="?" onclick="fnModeSubmit('pre_edit', 'id', '<!--{$arrParam.id|h}-->'); return false;">編集</a>
+        </td>
+        <td>
+			 <a href="?" onclick="fnModeSubmit('delete', 'id', '<!--{$arrParam.id|h}-->'); return false;">削除</a>
         </td>
     </tr>
-<!--{/section}-->
+<!--{/foreach}-->
 </table>
 
 </form>
