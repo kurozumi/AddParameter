@@ -27,7 +27,7 @@
 <h2><!--{$tpl_subtitle}--></h2>
 <form name="form1" id="form1" method="post" action="<!--{$smarty.server.REQUEST_URI|h}-->">
 <input type="hidden" name="<!--{$smarty.const.TRANSACTION_ID_NAME}-->" value="<!--{$transactionid}-->" />
-<input type="hidden" name="mode" value="add">
+<input type="hidden" name="mode" value="regist">
 
 <!--{if $arrErr}-->
 	<p class="remark">
@@ -70,7 +70,7 @@
 </div>
 
 		
-<h2>追加されたパラメータ</h2>
+<h2>追加したパラメータ一覧</h2>
 <table border="0" cellspacing="1" cellpadding="8" summary=" ">
     <tr >
         <th bgcolor="#f3f3f3">定数名</th>

@@ -43,7 +43,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         parent::init();
 
         $this->tpl_mainpage = PLUGIN_UPLOAD_REALDIR . "AddParameter/templates/config.tpl";
-        $this->tpl_subtitle = "パラメータ追加";
+        $this->tpl_subtitle = "パラメータ登録";
 
         $this->masterData = new SC_DB_MasterData_Ex();
 
@@ -88,7 +88,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
 
         $arrForm = array();
         switch ($this->getMode()) {
-            case 'add':
+            case 'regist':
                 $arrForm = $objFormParam->getHashArray();
 
                 $this->arrErr = $this->checkError($objFormParam);
