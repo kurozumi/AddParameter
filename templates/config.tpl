@@ -52,11 +52,6 @@
 		</td>
 	</tr>
 	<tr>
-        <th>パラメータ値</th>		
-        <td>
-			<input type="text" name="name" value="<!--{$arrForm.name|h}-->" class="box50" />
-        </td>
-	</tr>
 		<th>コメント</th>
         <td>
 			<input type="text" name="remarks" value="<!--{$arrForm.remarks|h}-->" class="box50" />

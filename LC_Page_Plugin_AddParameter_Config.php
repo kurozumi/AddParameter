@@ -106,12 +106,13 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
                 $arrForm = $objFormParam->getHashArray();
 
                 $this->arrErr = $objFormParam->checkError();
+
                 // エラーなしの場合にはデータを更新
                 if (count($this->arrErr) == 0) {
                     switch ($mode) {
                         case 'regist':// データ挿入
                             $this->arrErr = $this->checkId($id);
-                            
+
                             // 定数名にエラーがない場合データを挿入
                             if (count($this->arrErr) == 0) {
                                 $this->insert($arrForm);
@@ -158,8 +159,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     function lfInitParam(&$objFormParam)
     {
         $objFormParam->addParam('定数名', 'id', STEXT_LEN, 'KVa', array('EXIST_CHECK', 'NO_SPTAB', 'MAX_LENGTH_CHECK'));
-        $objFormParam->addParam('パラメータ値', 'name', STEXT_LEN, 'KVa', array('EXIST_CHECK', 'NO_SPTAB', 'MAX_LENGTH_CHECK'));
-        $objFormParam->addParam('コメント', 'remarks', STEXT_LEN, 'KVa', array('NO_SPTAB', 'MAX_LENGTH_CHECK'));
+        $objFormParam->addParam('コメント', 'remarks', STEXT_LEN, 'KVa');
 
     }
 
