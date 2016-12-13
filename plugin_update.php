@@ -21,11 +21,14 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-
-class plugin_update{
-    function update($arrPlugin) {
+class plugin_update
+{
+    function update($arrPlugin)
+    {
         // nop
+
     }
+
 }
 
 ?>

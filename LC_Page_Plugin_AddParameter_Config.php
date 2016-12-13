@@ -1,5 +1,4 @@
 <?php
-
 /*
  * This file is part of EC-CUBE
  *
@@ -27,10 +26,8 @@ require_once CLASS_EX_REALDIR . 'page_extends/admin/LC_Page_Admin_Ex.php';
 
 class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
 {
-
     /** 定数キーとなる配列 */
     public $arrKeys;
-    
     public $arrForm = array();
 
     /**
@@ -41,20 +38,20 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     function init()
     {
         parent::init();
-		
+
         $this->tpl_mainpage = PLUGIN_UPLOAD_REALDIR . "AddParameter/templates/config.tpl";
         $this->tpl_subtitle = "パラメータ追加";
 
         $this->masterData = new SC_DB_MasterData_Ex();
-		
-		$plugin = SC_Plugin_Util_Ex::getPluginByPluginCode("AddParameter");
-		
-		if($plugin["enable"]==2) {
-			$this->tpl_onload = "alert('プラグインを有効にして下さい。');";
-			$this->tpl_onload .= 'window.close();';
-		}
-    }
 
+        $plugin = SC_Plugin_Util_Ex::getPluginByPluginCode("AddParameter");
+
+        if ($plugin["enable"] == 2) {
+            $this->tpl_onload = "alert('プラグインを有効にして下さい。');";
+            $this->tpl_onload .= 'window.close();';
+        }
+
+    }
     /**
      * プロセス.
      *
@@ -64,8 +61,8 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     {
         $this->action();
         $this->sendResponse();
-    }
 
+    }
     /**
      * Page のアクション.
      *
@@ -89,8 +86,7 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
                 $this->arrErr = $this->checkError($objFormParam);
 
                 // エラーなしの場合にはデータを更新
-                if (count($this->arrErr) == 0)
-                {
+                if (count($this->arrErr) == 0) {
                     // データ挿入
                     $this->insert($arrForm);
 
@@ -104,8 +100,8 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
 
         $this->arrForm = $arrForm;
         $this->setTemplate($this->tpl_mainpage);
-    }
 
+    }
     /**
      * デストラクタ.
      *
@@ -114,8 +110,8 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     function destroy()
     {
         parent::destroy();
-    }
 
+    }
     /**
      * パラメーター情報の初期化
      *
@@ -127,8 +123,8 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
         $objFormParam->addParam('定数名', 'id', STEXT_LEN, 'KVa', array('EXIST_CHECK', 'NO_SPTAB', 'MAX_LENGTH_CHECK'));
         $objFormParam->addParam('パラメータ値', 'name', STEXT_LEN, 'KVa', array('EXIST_CHECK', 'NO_SPTAB', 'MAX_LENGTH_CHECK'));
         $objFormParam->addParam('コメント', 'remarks', STEXT_LEN, 'KVa', array('NO_SPTAB', 'MAX_LENGTH_CHECK'));
-    }
 
+    }
     /**
      * パラメーター情報を更新する.
      *
@@ -147,8 +143,8 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
 
         // キャッシュを生成
         $this->masterData->createCache('mtb_constants', array(), true, array('id', 'remarks'));
-    }
 
+    }
     /**
      * パラメーターのキーを配列で返す.
      *
@@ -159,14 +155,13 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     {
         $keys = array();
         $i = 0;
-        foreach ($this->masterData->getDBMasterData('mtb_constants') as $key => $val)
-        {
+        foreach ($this->masterData->getDBMasterData('mtb_constants') as $key => $val) {
             $keys[$i] = $key;
             $i++;
         }
         return $keys;
-    }
 
+    }
     /**
      * エラーチェック
      * 
@@ -177,29 +172,26 @@ class LC_Page_Plugin_AddParameter_Config extends LC_Page_Admin_Ex
     {
         $arrErr = array();
 
-        if (!preg_match("/^PLG_/", $objFormParam->getValue('id')))
-        {
+        if (!preg_match("/^PLG_/", $objFormParam->getValue('id'))) {
             $arrErr["id"] = sprintf("※ 定数名の先頭には「PLG_」を付けて下さい。");
         }
 
-        foreach (explode("_", $objFormParam->getValue('id')) as $str)
-        {
+        foreach (explode("_", $objFormParam->getValue('id')) as $str) {
             if (!ctype_upper($str))
                 $arrErr["id"] = "※ 定数名は英数の大文字を使用して下さい。また区切り文字としてアンダースコア(_)を使用して下さい。";
         }
 
         $constants = $this->getParamKeys();
 
-        if (in_array($objFormParam->getValue('id'), $constants))
-        {
+        if (in_array($objFormParam->getValue('id'), $constants)) {
             $arrErr["id"] = sprintf("※ 定数名「%s」は定義済みです。", $objFormParam->getValue('id'));
         }
 
         $arrErr = array_merge($arrErr, $objFormParam->checkError());
 
         return $arrErr;
-    }
 
+    }
 }
 
 ?>

@@ -1,5 +1,4 @@
 <?php
-
 /*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
@@ -13,10 +12,10 @@
  */
 class AddParameter extends SC_Plugin_Base
 {
-
     public function __construct(array $arrSelfInfo)
     {
         parent::__construct($arrSelfInfo);
+
     }
 
     /**
